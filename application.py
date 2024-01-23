@@ -5,17 +5,19 @@ import subprocess
 import os
 import shlex
 
-"""
-Pour run le code: dans terminal windows (ou invité de commande), tapez:
-powershell
-cd D:\-PFE      (nom du dossier où est enregistré le fichier)
-streamlit run application.py
+# ---------------------------------- Consignes pour run le code :
+# Dans terminal windows (ou invité de commande), tapez:
+
+# powershell
+# cd D:\-PFE\ECE-2024-PFE      (nom du dossier où est enregistré le fichier)
+# streamlit run application.py
 
 
-ls : pour voir le contenu du dossier
-cd : pour accéder à un chemin
-powershell : version + puissante du terminal
-"""
+#ls : pour voir le contenu du dossier
+# cd : pour accéder à un chemin
+# powershell : version + puissante du terminal
+
+# -----------------------------------
 
 st.image("./automne.jpg" )
 
