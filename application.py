@@ -19,33 +19,7 @@ import shlex
 
 # -----------------------------------
 
-st.image("./automne.jpg" )
-
-# Ajout d'un logo
-logo_path = "./logo2.png"
-st.image(logo_path, width=200)
-
-# Titre de la page
-st.title("Bienvenue sur Picto Music")
-
-# Sous-titre
-st.header("Découvrez une nouvelle manière de composer de la musique")
-
-# Paragraphe de texte
-st.text("")
-
-# Ajout des champ de texte :
-titre_partition = st.text_input("Saisissez le titre de votre partition : ")
-nom_compositeur = st.text_input("Saisissez votre nom de compositeur : ")
-nom_audio = st.text_input("Saisissez le nom exact de votre fichier audio : ")
-chemin_audio = f"./{nom_audio}.mid"
-
-if nom_audio and not os.path.exists(chemin_audio):
-    st.warning(f"Le fichier audio '{nom_audio}' n'existe pas. Veuillez vérifier le nom du fichier.")
-    st.stop()
-
-
-def generate_musescore_from_midi(midi_file_path, output_musicxml_path):
+def generate_musescore_from_midi(midi_file_path, output_musicxml_path, titre_partition, nom_compositeur):
     # Charger le fichier MIDI
     midi_stream = converter.parse(midi_file_path)
 
@@ -95,7 +69,29 @@ def convert_musicxml_to_pdf(input_musicxml, output_pdf):
 
 
 # Définition de la fonction principale
-def main():
+# Fonction principale pour la page Partition
+def partition_page():
+
+    st.image("./automne.jpg")
+
+    # Ajout d'un logo
+    # logo_path = "./logo2.png"
+    # st.sidebar.image(logo_path, width=200)
+    # st.image(logo_path, width=200)
+
+    # Titre de la page
+    st.title("Créez votre partition : ")
+
+    # Ajout des champs de texte :
+    titre_partition = st.text_input("Saisissez le titre de votre partition : ")
+    nom_compositeur = st.text_input("Saisissez votre nom de compositeur : ")
+    nom_audio = st.text_input("Saisissez le nom exact de votre fichier audio : ")
+    chemin_audio = f"./{nom_audio}.mid"
+
+    if nom_audio and not os.path.exists(chemin_audio):
+        st.warning(f"Le fichier audio '{nom_audio}' n'existe pas. Veuillez vérifier le nom du fichier.")
+        st.stop()
+
 
     # Ajout d'un bouton
     if st.button("Générer la partition"):
@@ -104,7 +100,7 @@ def main():
         output_musicxml_path = f"./partitions/{titre_partition}.musicxml"
 
         if not os.path.exists(output_musicxml_path):
-            generate_musescore_from_midi(midi_file_path, output_musicxml_path)
+            generate_musescore_from_midi(midi_file_path, output_musicxml_path, titre_partition, nom_compositeur)
             st.write(f"Votre partition '{titre_partition}' a été générée !")
         else:
             st.write(f"Une partition avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
@@ -121,6 +117,32 @@ def main():
             st.write(f"Une partition PDF avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
 
 
+def menu_page():
+
+    # Titre de la page
+    st.sidebar.title("Bienvenue sur Picto Music !")
+    # st.title("Bienvenue sur Picto Music !")
+
+    # Ajout d'un logo
+    logo_path = "./logo2.png"
+    st.sidebar.image(logo_path, width=200)
+    # st.image(logo_path, width=200)
+
+    # Sous-titre
+    st.sidebar.header("Découvrez une nouvelle manière de composer de la musique")
+    # st.header("Découvrez une nouvelle manière de composer de la musique")
+
+    # Paragraphe de texte
+    st.sidebar.text("Appuyez sur le bouton suivant pour accéder à la page de génération de partition")
+    # st.text("Appuyez sur le bouton suivant pour accéder à la page de génération de partition")
+
+    if st.sidebar.button("Partition"):
+    # if st.button("Partition"):
+        partition_page()
+
+
+
 # Appel de la fonction principale pour l'exécution de l'application
-main()
+menu_page()
+
 
