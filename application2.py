@@ -49,11 +49,11 @@ categories_instruments = {
     "Animals": (113, 123),  # Tinkle Bell à Bird Tweet
     "Applause": (126, 127),  # Applause
     "Atmosphere": (88, 94),  # New Age Syn Pad à Halo Syn Pad
-    "Bells": (14, 14),  # Tubular Bells
+    "Bells": (13, 14),  # Xylophone, Tubular Bells
     "Birds": (72, 78),  # Piccolo à Ocarina
-    "Clocks": (0, 20),  # Acoustic Grand Piano à Accordion
+    "Clocks": (0, 7),  # Acoustic Grand Piano à Clavinet
     "Crowds": (48, 62),  # String Ensemble 1 à Syn Brass 2
-    "Daily Life": (0, 27),  # Acoustic Grand Piano à Clean Electric Guitar
+    "Daily Life": (24, 31),  # Guitar
     "Destruction": (116, 118),  # Melodic Tom à Syn Drum
     "Electronics": (80, 127),  # Syn Square Wave à Gun Shot
     "Events": (48, 62),  # String Ensemble 1 à Syn Brass 2
@@ -99,14 +99,14 @@ def instruments_possibles(categorie, categories_instruments):
         return liste_instruments
     else:
         return []
-    
+
 
 # Liste d'instruments possibles pour cette catégorie
 liste_instruments_correspondants = instruments_possibles(categorie, categories_instruments)
 st.write("Instruments possibles :", liste_instruments_correspondants)
 
 
-mode = st.text_input("Entrez le mode du morceau (majeur ou mineur) : ")
+mode = st.text_input("Entrez le mode du morceau (Majeur ou mineur) : ")
 # Vérification du mode saisi
 if mode == '':
     print('')
@@ -265,52 +265,6 @@ def change_instrument(input_file, output_file, new_instrument1, new_instrument2)
         print(f"Une erreur s'est produite : {e}")
 
 
-#Version de base
-def change_instrument2(input_file, output_file, new_instrument1, new_instrument2):
-    try:
-        # Charger le fichier MIDI d'entrée
-        midi_file = MidiFile(input_file)
-
-        # Créer un nouveau fichier MIDI
-        new_midi_file = MidiFile()
-
-        # Parcourir toutes les pistes du fichier MIDI d'entrée
-        for i, track in enumerate(midi_file.tracks):
-            new_track1 = MidiTrack()
-            new_midi_file.tracks.append(new_track1)
-
-            new_track2 = MidiTrack()
-            new_midi_file.tracks.append(new_track2)
-            # Indicateur pour savoir si le message "Program Change" a été ajouté à cette piste
-            program_change_added = False
-
-            # Parcourir tous les messages sur la piste
-            for msg in track:
-                # Vérifier si le message est du type "Program Change" (changement d'instrument)
-                if msg.type == 'program_change':
-                    # Mettre à jour l'instrument
-                    new_track1.append(Message('program_change', program=new_instrument1, time=msg.time))
-                    new_track2.append(Message('program_change', program=new_instrument2, time=msg.time))
-
-                    program_change_added = True
-                else:
-                    # Copier les autres messages tels quels
-                    new_track1.append(msg)
-                    new_track2.append(msg)
-
-            # Si aucun message "Program Change" n'a été trouvé sur la piste, l'ajouter
-            if not program_change_added:
-                new_track1.append(Message('program_change', program=new_instrument1, time=0))
-                new_track2.append(Message('program_change', program=new_instrument2, time=0))
-
-        # Sauvegarder le nouveau fichier MIDI
-        new_midi_file.save(output_file)
-
-        print(f"L'instrument a été changé avec succès dans le fichier {output_file}")
-
-    except Exception as e:
-        print(f"Une erreur s'est produite : {e}")
-
 
 
 if st.button("Générer l'audio"):
@@ -339,7 +293,7 @@ if st.button("Générer l'audio"):
 
         # Spécifier l'instrument avant d'ajouter des notes à la piste
         instrument = random.choice(liste_instruments_correspondants)
-        print(instrument)
+        st.write(instrument)
         midi.addProgramChange(track, channel, time, instrument)
 
         # Ajouter des notes basées sur les couleurs quantifiées
@@ -357,7 +311,7 @@ if st.button("Générer l'audio"):
         # Extraire les deux instruments choisis
         instrument1 = instruments_choices[0]
         instrument2 = instruments_choices[1] 
-        print("Les deux instruments choisis sont:", instrument1, instrument2)
+        st.write("Les deux instruments choisis sont:", instrument1, instrument2)
         
 
         # Construction d'un chemin absolu pour le fichier audio
@@ -441,41 +395,45 @@ def partition_page():
     st.title("Créez votre partition : ")
 
     # Ajout des champs de texte :
-    titre_partition = st.text_input("Saisissez le titre de votre partition (sans espace !!): ")
+    titre_partition = st.text_input("Saisissez le titre de votre partition (sans espace): ")
+    nom_compositeur = st.text_input("Saisissez votre nom de compositeur : ")
+
     # Vérifier si le titre de la partition contient des espaces
     if ' ' in titre_partition:
         st.warning("Le titre de la partition ne doit pas contenir d'espaces. Veuillez saisir un titre sans espaces.")
-    
-    nom_compositeur = st.text_input("Saisissez votre nom de compositeur : ")
+    elif titre_partition == "":
+        st.warning("Le titre de la partition ne peut pas être vide. Veuillez saisir un titre.")
 
-    # Ajout d'un bouton
-    if st.button("Générer la partition"):
-        # génération de la partition
-        midi_file_path = f"./{nom_audio}.mid"
-        output_musicxml_path = f"./partitions/{titre_partition}.musicxml"
+    else:
+        
+        # Ajout d'un bouton
+        if st.button("Générer la partition"):
+            # génération de la partition
+            midi_file_path = f"./{nom_audio}.mid"
+            output_musicxml_path = f"./partitions/{titre_partition}.musicxml"
 
-        if not os.path.exists(output_musicxml_path):
-            generate_musescore_from_midi(midi_file_path, output_musicxml_path, titre_partition, nom_compositeur)
-            st.write(f"Votre partition '{titre_partition}' a été générée !")
-        else:
-            st.write(f"Une partition avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
-
-
-    if st.button("Générer en PDF"):
-        # génération en PDF
-        output_musicxml_path = f"./partitions/{titre_partition}.musicxml"
-        output_pdf = f"./partitions/{titre_partition}.pdf"
-
-        if not os.path.exists(output_pdf):
-            convert_musicxml_to_pdf(output_musicxml_path, output_pdf)
-
-            # Vérifier si le fichier PDF a été enregistré avec succès
-            if os.path.exists(output_pdf):
-                st.write(f"Votre partition '{titre_partition}' est disponible en PDF.")
+            if not os.path.exists(output_musicxml_path):
+                generate_musescore_from_midi(midi_file_path, output_musicxml_path, titre_partition, nom_compositeur)
+                st.write(f"Votre partition '{titre_partition}' a été générée !")
             else:
-                st.error("Erreur lors de l'enregistrement du fichier PDF. Veuillez réessayer.")
-        else:
-            st.write(f"Une partition PDF avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
+                st.write(f"Une partition avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
+
+
+        if st.button("Générer en PDF"):
+            # génération en PDF
+            output_musicxml_path = f"./partitions/{titre_partition}.musicxml"
+            output_pdf = f"./partitions/{titre_partition}.pdf"
+
+            if not os.path.exists(output_pdf):
+                convert_musicxml_to_pdf(output_musicxml_path, output_pdf)
+
+                # Vérifier si le fichier PDF a été enregistré avec succès
+                if os.path.exists(output_pdf):
+                    st.write(f"Votre partition '{titre_partition}' est disponible en PDF.")
+                else:
+                    st.error("Erreur lors de l'enregistrement du fichier PDF. Veuillez réessayer.")
+            else:
+                st.write(f"Une partition PDF avec le nom '{titre_partition}' existe déjà. Veuillez choisir un autre nom.")
 
 
 def menu_page():
