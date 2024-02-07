@@ -37,7 +37,7 @@ from PIL import Image
 
 # powershell
 # cd D:\-PFE\ECE-2024-PFE      (nom du dossier où est enregistré le fichier)
-# streamlit run application.py
+# streamlit run application3.py
 
 
 #ls : pour voir le contenu du dossier
@@ -419,7 +419,7 @@ if image_path and os.path.isfile(image_path):
         print("Label 3:", label3)
 
         labels_extraits = [label1, label2, label3]
-        st.write("Labels extraits :", labels_extraits)
+        # st.write("Labels extraits :", labels_extraits)
         categorie = trouver_categorie(labels_extraits, categories)
         st.write("Catégorie correspondante :", categorie)
         
